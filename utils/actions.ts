@@ -1,10 +1,11 @@
 'use server'
 
-import { imageSchema, profileSchema, validatedWithZodSchema } from "./schema";
+import { imageSchema, profileSchema, propertySchema, validatedWithZodSchema } from "./schema";
 import db from "./db";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { uploadImage } from "./supabase";
 
 const getAuthUser = async()=> {
   const user = await currentUser()
@@ -106,9 +107,75 @@ export const updateProfileImageAction = async (
   prevState: any,
   formData: FormData
 ): Promise<{ message: string }> => {
-  const image = formData.get('image') as File;
-  const validatedFields = validatedWithZodSchema(imageSchema, {image})
-  console.log(validatedFields);
+  const user = await getAuthUser();
+  try {
+    const image = formData.get('image') as File;
+    const validatedFields = validatedWithZodSchema(imageSchema, {image})
+    const fullPath = await uploadImage(validatedFields.image)
+    
+    await db.profile.update({
+      where:{
+        clerkId:user.id
+      },data: {
+        profileImage: fullPath
+      },
+    });
+
+    revalidatePath('/profile')
+    
+    return { message: "Profile image updated successfully" };
+  } catch (error) {
+    return renderError(error)
+  }
   
-  return { message: "Profile image updated successfully" };
 };
+
+export const createPropertyAction = async (
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> => {
+  const user = await getAuthUser();
+  try {
+    const rawData = Object.fromEntries(formData)
+    const file = formData.get('image') as File
+    const validatedFields = validatedWithZodSchema(propertySchema, rawData)
+    const validatedFile = validatedWithZodSchema(imageSchema, {image:file})
+    const fullPath = await uploadImage(validatedFile.image)
+
+    await db.property.create({
+      data: {
+        ...validatedFields,
+        image: fullPath,
+        profileId: user.id
+      }
+    })
+
+  } catch (error) {
+    renderError(error)
+  }
+  redirect('/')
+}
+
+export const fetchProperties = async({search='',category}:{search?:string,category?:string}) => {
+  const properties = await db.property.findMany({
+    where: {
+      category,
+      OR: [
+        { name:{contains:search,mode:'insensitive'} },
+        { tagline: {contains:search,mode:'insensitive'}},
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      tagline: true,
+      country: true,
+      price: true,
+      image: true,
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+  return properties
+}
