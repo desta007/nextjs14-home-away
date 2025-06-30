@@ -1,7 +1,9 @@
 import { FaStar } from 'react-icons/fa'
 
 function PropertyRating({
+    propertyId, 
     inPage}:{
+        propertyId:string; 
         inPage:boolean;
     }) {
         // temp hardcode
