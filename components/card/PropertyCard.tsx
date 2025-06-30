@@ -29,8 +29,8 @@ function PropertyCard({property}:{property:PropertyCardProps}) {
             </p>
             <div className="flex justify-between items-center mt-1">
                 <p className="text-sm mt-1">
-                    <span className="font-semibold">{formatCurrency(price)}</span>
-                    &nbsp;night
+                    <span className="font-semibold">{formatCurrency(price)} </span>
+                    night
                 </p>
                 {/* country and flag */}
                 <CountryFlagAndName countryCode={country} />
