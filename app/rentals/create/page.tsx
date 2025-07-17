@@ -48,7 +48,7 @@ function CreatePropertyPage() {
                 <CounterInput detail="baths" />
                 <h3 className="text-lg mt-10 mb-6 font-medium">Amenities</h3>
                 <AmenitiesInput />
-                <SubmitButton text="create rental" className="mt-12" />
+                <SubmitButton text="create rental" className="mt-12" size={"default"} />
             </FormContainer>
         </div>
     </section>
