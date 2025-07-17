@@ -28,6 +28,7 @@ function BookingCalendar() {
 
     useEffect(()=> {
       const selectedRange = generateDateRange(range)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const isDisabledDateIncluded = selectedRange.some((date) => {
         if (unavailableDates[date]) {
           setRange(defaultSelected)

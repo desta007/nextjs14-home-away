@@ -4,6 +4,7 @@ import { type NextRequest, type NextResponse } from "next/server";
 import db from "@/utils/db";
 import { formatDate } from "@/utils/format";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const POST = async (req: NextRequest, res: NextResponse) => {
     const requestHeaders  = new Headers(req.headers)
     const origin = requestHeaders.get('origin')
