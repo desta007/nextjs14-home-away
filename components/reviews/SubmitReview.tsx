@@ -22,7 +22,7 @@ function SubmitReview({propertyId}:{propertyId:string}) {
                     <input type="hidden" name="propertyId" value={propertyId} />
                     <RatingInput name="rating" />
                     <TextAreaInput name="comment" labelText="your thoughts on this property" defaultValue="Amazing place !!!" />
-                    <SubmitButton text="Submit" className="mt-4" />
+                    <SubmitButton text="Submit" className="mt-4" size={"default"} />
                 </FormContainer>
             </Card>
         }
