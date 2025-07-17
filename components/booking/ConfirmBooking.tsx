@@ -26,7 +26,7 @@ function ConfirmBooking() {
   const createBooking = createBookingAction.bind(null, {propertyId, checkIn, checkOut})
   return <section>
     <FormContainer action={createBooking}>
-      <SubmitButton text="Reserve" className="w-full" />
+      <SubmitButton text="Reserve" className="w-full" size={"default"} />
     </FormContainer>
   </section>
 }
