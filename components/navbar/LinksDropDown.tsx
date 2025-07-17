@@ -12,8 +12,12 @@ import UserIcon from "./UserIcon";
 import { links } from "@/utils/links";
 import SignOutLink from "./SignOutLink";
 import { SignedOut, SignedIn, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 function LinksDropDown() {
+  const {userId} = auth()
+  const isAdminUser = userId === process.env.ADMIN_USER_ID
+  
   return <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant='outline' className="flex gap-4 max-w-[100px]">
@@ -37,6 +41,8 @@ function LinksDropDown() {
       </SignedOut>
       <SignedIn>
         {links.map((link)=> {
+          if (link.label == 'admin' && !isAdminUser) return null
+          
           return (
 
           <DropdownMenuItem key={link.href}>

@@ -1,7 +1,6 @@
 import FavoriteToggleButton from "@/components/card/FavoriteToggleButton";
 import PropertyRating from "@/components/card/PropertyRating";
 import Amenities from "@/components/properties/Amenities";
-import BookingCalendar from "@/components/properties/BookingCalendar";
 import BreadCrumbs from "@/components/properties/BreadCrumbs";
 import Description from "@/components/properties/Description";
 import ImageContainer from "@/components/properties/ImageContainer";
@@ -12,13 +11,19 @@ import PropertyReviews from "@/components/reviews/PropertyReviews";
 import SubmitReview from "@/components/reviews/SubmitReview";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchPropertyDetails } from "@/utils/actions";
+import { fetchPropertyDetails, findExistingReview } from "@/utils/actions";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
 const DynamicMap = dynamic(()=> import('@/components/properties/PropertyMap'), {
     ssr: false,
     loading: () => <Skeleton className="h-[400px] w-full" />
+})
+
+const DynamicBookingWrapper = dynamic(()=> import('@/components/booking/BookingWrapper'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[200px] w-full" />
 })
 
 async function PropertyDetailsPage({params}:{params:{id:string}}) {
@@ -29,6 +34,10 @@ async function PropertyDetailsPage({params}:{params:{id:string}}) {
     const details = {baths, bedrooms, beds, guests}
     const firstName = property.profile.firstName 
     const profileImage = property.profile.profileImage
+
+    const {userId} = auth()
+    const isNotOwner = property.profile.clerkId !== userId
+    const reviewDoestNotExist = userId && isNotOwner && !(await findExistingReview(userId,property.id))
 
   return <section>
     <BreadCrumbs name={property.name} />
@@ -55,10 +64,12 @@ async function PropertyDetailsPage({params}:{params:{id:string}}) {
         <DynamicMap countryCode={property.country} />
       </div>
       <div className="lg:col-span-4 flex flex-col items-center">
-        <BookingCalendar />
+        <DynamicBookingWrapper propertyId={property.id} price={property.price}
+        bookings={property.bookings} />
       </div>
     </section>
-    <SubmitReview propertyId={property.id} />
+    { reviewDoestNotExist && <SubmitReview propertyId={property.id} /> }
+    
     <PropertyReviews propertyId={property.id} />
 
   </section>
