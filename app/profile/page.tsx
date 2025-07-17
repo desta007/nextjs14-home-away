@@ -34,7 +34,7 @@ async function ProfilePage() {
               defaultValue={profile.username}
             />
           </div>
-          <SubmitButton text="Update Profile" className="mt-8" />
+          <SubmitButton text="Update Profile" className="mt-8" size={"default"} />
         </FormContainer>
       </div>
     </section>
